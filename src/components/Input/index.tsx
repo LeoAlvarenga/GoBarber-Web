@@ -1,8 +1,15 @@
-import React, { InputHTMLAttributes, useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  InputHTMLAttributes,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 
-import { Container } from "./styles";
+import { Container, Errors } from "./styles";
 import { IconBaseProps } from "react-icons/lib";
 import { useField } from "@unform/core";
+import { FiAlertCircle } from "react-icons/fi";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -20,16 +27,15 @@ const Input: React.FC<InputProps> = ({ name, icon: Icon, ...restProps }) => {
    * so it prevents the function to be created again every time the component is rendered
    */
 
-   const handleInputFocus = useCallback(() => {
-     setIsFocused(true)
-   }, [])
+  const handleInputFocus = useCallback(() => {
+    setIsFocused(true);
+  }, []);
 
   const handleInputBlur = useCallback(() => {
-    setIsFocused(false)
+    setIsFocused(false);
 
-    setIsFilled(!!inputRef.current?.value)
-
-  }, [])
+    setIsFilled(!!inputRef.current?.value);
+  }, []);
 
   useEffect(() => {
     registerField({
@@ -40,7 +46,7 @@ const Input: React.FC<InputProps> = ({ name, icon: Icon, ...restProps }) => {
   }, [fieldName, registerField]);
 
   return (
-    <Container isFocused={isFocused} isFilled={isFilled}>
+    <Container isFocused={isFocused} isFilled={isFilled} hasError={!!error}>
       {Icon && <Icon size={20} />}
       <input
         onFocus={handleInputFocus}
@@ -49,7 +55,11 @@ const Input: React.FC<InputProps> = ({ name, icon: Icon, ...restProps }) => {
         ref={inputRef}
         {...restProps}
       />
-      {error}
+      {error && (
+        <Errors title={error}>
+          <FiAlertCircle color="#c53030" size={20} />
+        </Errors>
+      )}
     </Container>
   );
 };
