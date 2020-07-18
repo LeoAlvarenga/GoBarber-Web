@@ -5,13 +5,14 @@ import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
 import { Form } from '@unform/web';
 import * as Yup from 'yup'
 
-import { useAuth } from '../../hooks/AuthContext'
+import { useAuth } from '../../hooks/auth'
 
 import LogoImg from "../../assets/logo.svg";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import { FormHandles } from "@unform/core";
 import getValidationErrors from "../../utils/getValidationErrors";
+import { useToast } from "../../hooks/toast";
 
 interface SignInFormData {
   email: string;
@@ -23,6 +24,7 @@ const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null)
 
   const { user ,signIn } = useAuth()
+  const { addToast } = useToast()
 
   console.log(user)
 
@@ -42,15 +44,18 @@ const SignIn: React.FC = () => {
         abortEarly: false,
       });
 
-      signIn({
+      await signIn({
         email: data.email,
         password: data.password
       })
     } catch (error) {
       console.log(error);
+      if(error instanceof Yup.ValidationError) {
+        const validationErrors = getValidationErrors(error)
+        formRef.current?.setErrors(validationErrors);
+      }
 
-      const validationErrors = getValidationErrors(error)
-      formRef.current?.setErrors(validationErrors);
+      addToast()
     }
   }, [signIn]);
 
