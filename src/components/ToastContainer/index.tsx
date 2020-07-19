@@ -1,50 +1,39 @@
-import React from 'react';
-import { FiAlertCircle, FiXCircle } from 'react-icons/fi';
+import React  from "react";
 
-import { Container, Toast } from './styles';
+import { Container } from "./styles";
+import { ToastMessage } from "../../hooks/toast";
+import Toast from './Toast/index'
+import { useTransition } from 'react-spring';
 
-const ToastContainer: React.FC = () => {
+export interface ToastContainerProps {
+  messages: ToastMessage[];
+}
+
+const ToastContainer: React.FC<ToastContainerProps> = ({ messages }) => {
+
+  const messageWithTransitions = useTransition(
+    messages,
+    message => message.id,
+    {
+      from: { right: '-120%', opacity: 0 },
+      enter: { right: '0%', opacity: 1 },
+      leave: { right: '-120%', opacity: 0 }
+    }
+  )
+
   return (
     <Container>
-        <Toast hasDescription>
-            <FiAlertCircle size={20} />
-
-            <div>
-                <strong>Aconteceu um erro</strong>
-                <p>Não foi possível fazer login na aplicação</p>
-            </div>
-
-            <button type="button">
-                <FiXCircle size={18} />
-            </button>
+      {messageWithTransitions.map(({ item, key, props }) => (
+        <Toast
+          key={key}
+          message={item}
+          styles={props}
+        >
+          
         </Toast>
-
-        <Toast hasDescription={false} type="success">
-            <FiAlertCircle size={20} />
-
-            <div>
-                <strong>Aconteceu um erro</strong>
-            </div>
-
-            <button type="button">
-                <FiXCircle size={18} />
-            </button>
-        </Toast>
-
-        <Toast hasDescription type="error">
-            <FiAlertCircle size={20} />
-
-            <div>
-                <strong>Aconteceu um erro</strong>
-                <p>Não foi possível fazer login na aplicação</p>
-            </div>
-
-            <button type="button">
-                <FiXCircle size={18} />
-            </button>
-        </Toast>
+      ))}
     </Container>
-    );
-}
+  );
+};
 
 export default ToastContainer;
